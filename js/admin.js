@@ -268,10 +268,28 @@ function saveGuide() {
   const desc    = document.getElementById('g-desc').value.trim();
   const due     = document.getElementById('g-due').value;
   const points  = parseInt(document.getElementById('g-points').value);
+  const fileInput = document.getElementById('g-file');
 
   if (!title || !subject || !due) { showToast('❌ Completa los campos obligatorios'); return; }
 
-  DB.addGuide({ title, subject, type, description: desc, dueDate: due, totalPoints: points, professor: currentUser.name });
+  const file = fileInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const fileData = { name: file.name, type: file.type, data: e.target.result };
+      DB.addGuide({ title, subject, type, description: desc, dueDate: due, totalPoints: points,
+        professor: currentUser.name, fileData });
+      afterSaveGuide();
+    };
+    reader.readAsDataURL(file);
+  } else {
+    DB.addGuide({ title, subject, type, description: desc, dueDate: due, totalPoints: points,
+      professor: currentUser.name, fileData: null });
+    afterSaveGuide();
+  }
+}
+
+function afterSaveGuide() {
   closeGuideModal();
   renderGuidesAdmin();
   renderOverview();

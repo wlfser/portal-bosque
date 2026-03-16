@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel Docente – Universidad El Bosque</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+</head>
+<body class="dashboard-body">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="logo-sm">UB</div>
+      <span>Universidad<br>El Bosque</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-label">Principal</span>
+    <button class="nav-item active" onclick="showSection('overview')">
+      <span class="nav-icon">📊</span> Resumen General
+    </button>
+    <button class="nav-item" onclick="showSection('guides')">
+      <span class="nav-icon">📋</span> Gestión de Guías
+    </button>
+    <button class="nav-item" onclick="showSection('students')">
+      <span class="nav-icon">🎓</span> Estudiantes
+    </button>
+    <button class="nav-item" onclick="showSection('progress')">
+      <span class="nav-icon">📈</span> Progreso & Notas
+    </button>
+    <span class="nav-label">Herramientas</span>
+    <button class="nav-item" onclick="showSection('reports')">
+      <span class="nav-icon">📄</span> Reportes
+    </button>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="admin-avatar">CG</div>
+    <div class="user-info">
+      <strong id="admin-name">Dr. Carlos García</strong>
+      <span>Docente</span>
+    </div>
+    <button class="btn-logout" title="Cerrar sesión" onclick="logout()">⏻</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <!-- SECCIÓN: RESUMEN GENERAL -->
+  <section id="sec-overview">
+    <div class="page-header">
+      <h2 id="welcome-msg">Panel Docente</h2>
+      <p>Vista general del estado académico del grupo</p>
+    </div>
+
+    <div class="stats-grid" id="stats-overview"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="card">
+        <div class="card-header">
+          <h3>Estado de Entregas por Guía</h3>
+        </div>
+        <div id="guides-overview-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Top Estudiantes</h3>
+        </div>
+        <div id="top-students-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: GUÍAS -->
+  <section id="sec-guides" style="display:none">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <h2>Gestión de Guías</h2>
+        <p>Crea, edita y monitorea las guías del semestre</p>
+      </div>
+      <button class="btn btn-primary" onclick="openNewGuideModal()">+ Nueva Guía</button>
+    </div>
+    <div id="guides-admin-list"></div>
+  </section>
+
+  <!-- SECCIÓN: ESTUDIANTES -->
+  <section id="sec-students" style="display:none">
+    <div class="page-header">
+      <h2>Lista de Estudiantes</h2>
+      <p>Todos los estudiantes registrados en el grupo</p>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Estudiantes Registrados</h3>
+        <div class="search-bar">
+          <span>🔍</span>
+          <input type="text" placeholder="Buscar estudiante..." oninput="filterStudents(this.value)" id="student-search"/>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="students-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Semestre</th>
+              <th>Guías Completadas</th>
+              <th>Promedio</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: PROGRESO -->
+  <section id="sec-progress" style="display:none">
+    <div class="page-header">
+      <h2>Progreso y Calificaciones</h2>
+      <p>Detalle de entregas por guía</p>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3>Selecciona una Guía</h3>
+        <select id="guide-filter" onchange="loadGuideProgress(this.value)"
+          style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;">
+          <option value="">-- Todas las guías --</option>
+        </select>
+      </div>
+      <div id="progress-table-wrap" class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Estudiante</th><th>Guía</th><th>Estado</th><th>Fecha Entrega</th><th>Nota</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="progress-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: REPORTES -->
+  <section id="sec-reports" style="display:none">
+    <div class="page-header">
+      <h2>Reportes Académicos</h2>
+      <p>Exporta y analiza el rendimiento del grupo</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="card" style="text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:12px">📊</div>
+        <h3 style="margin-bottom:8px">Reporte de Progreso</h3>
+        <p style="font-size:13px;color:var(--text-gray);margin-bottom:20px">Resumen del avance de todos los estudiantes</p>
+        <button class="btn btn-primary" onclick="exportReport('progress')">Generar Reporte</button>
+      </div>
+      <div class="card" style="text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:12px">📋</div>
+        <h3 style="margin-bottom:8px">Registro de Calificaciones</h3>
+        <p style="font-size:13px;color:var(--text-gray);margin-bottom:20px">Notas de todas las guías por estudiante</p>
+        <button class="btn btn-outline" onclick="exportReport('grades')">Exportar CSV</button>
+      </div>
+    </div>
+    <div class="card" id="report-output" style="display:none;margin-top:0">
+      <div class="card-header"><h3>Vista Previa del Reporte</h3></div>
+      <div id="report-content"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL: NUEVA GUÍA -->
+<div id="modal-guide" class="modal-overlay" style="display:none" onclick="closeGuideModal(event)">
+  <div class="modal">
+    <h3>➕ Nueva Guía / Actividad</h3>
+    <div class="form-row">
+      <label>Título</label>
+      <input type="text" id="g-title" placeholder="Ej: Guía de Laboratorio N°3"/>
+    </div>
+    <div class="form-row">
+      <label>Materia</label>
+      <input type="text" id="g-subject" placeholder="Ej: Biología Celular"/>
+    </div>
+    <div class="form-row">
+      <label>Tipo</label>
+      <select id="g-type">
+        <option value="lab">Guía de Laboratorio</option>
+        <option value="taller">Taller</option>
+        <option value="quiz">Evaluación / Quiz</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Descripción</label>
+      <textarea id="g-desc" placeholder="Describe los objetivos y actividades..."></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-row">
+        <label>Fecha Límite</label>
+        <input type="date" id="g-due"/>
+      </div>
+      <div class="form-row">
+        <label>Puntos Totales</label>
+        <input type="number" id="g-points" value="100"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeGuideModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveGuide()">Guardar Guía</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CALIFICAR -->
+<div id="modal-grade" class="modal-overlay" style="display:none" onclick="closeGradeModal(event)">
+  <div class="modal">
+    <h3>✏️ Calificar Entrega</h3>
+    <p id="grade-student-info" style="font-size:14px;color:var(--text-gray);margin-bottom:20px"></p>
+    <div class="form-row">
+      <label>Calificación (sobre <span id="grade-max">100</span> pts)</label>
+      <input type="number" id="grade-score" min="0" max="100"/>
+    </div>
+    <div class="form-row">
+      <label>Comentario (opcional)</label>
+      <textarea id="grade-comment" placeholder="Retroalimentación para el estudiante..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeGradeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveGrade()">Guardar Nota</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DETALLE ESTUDIANTE -->
+<div id="modal-student" class="modal-overlay" style="display:none" onclick="closeStudentModal(event)">
+  <div class="modal" style="max-width:600px">
+    <h3 id="modal-student-name">Detalle del Estudiante</h3>
+    <div id="modal-student-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeStudentModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/auth.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>

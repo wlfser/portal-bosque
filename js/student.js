@@ -295,6 +295,19 @@ function openGuideModal(guideId) {
         ${sub.comment ? `<div style="font-size:13px;color:var(--text-gray);margin-top:6px">💬 ${sub.comment}</div>` : ''}
       </div>
     ` : ''}
+    ${g.fileData ? `
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:28px">📎</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:#1d4ed8">Archivo adjunto</div>
+          <div style="font-size:12px;color:var(--text-gray)">${g.fileData.name}</div>
+        </div>
+        <a href="${g.fileData.data}" download="${g.fileData.name}"
+          style="background:#2563eb;color:white;padding:8px 14px;border-radius:8px;font-size:13px;text-decoration:none;font-weight:500">
+          ⬇️ Descargar
+        </a>
+      </div>
+    ` : ''}
   `;
 
   document.getElementById('modal-guide-footer').innerHTML = `

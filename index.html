@@ -27,12 +27,16 @@
         <span class="role-icon">👨‍🏫</span>
         <span>Profesor</span>
       </button>
+      <button class="role-btn" data-role="superadmin" onclick="switchRole('superadmin')">
+        <span class="role-icon">🛡️</span>
+        <span>Admin</span>
+      </button>
     </div>
 
     <form class="login-form" onsubmit="handleLogin(event)">
       <div class="form-group">
         <label id="user-label">Código Estudiantil</label>
-        <input type="text" id="username" placeholder="Ej: 20231234" required />
+        <input type="text" id="username" placeholder="Ej: 20231001" required />
       </div>
       <div class="form-group">
         <label>Contraseña</label>
